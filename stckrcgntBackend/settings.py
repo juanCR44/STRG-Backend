@@ -24,8 +24,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cvua#7a9fv^%49k%&+tu)ij81l%!0$%1neu%&n&u(=_h0zez%='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-DEBUG_PROPAGATE_EXCEPTIONS = True
+DEBUG = True
+# DEBUG_PROPAGATE_EXCEPTIONS = True
 
 ALLOWED_HOSTS = ['django-stockrcgnt.herokuapp.com', 'localhost:3000']
 CORS_ORIGIN_ALLOW_ALL = True
