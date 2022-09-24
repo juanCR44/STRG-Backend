@@ -31,7 +31,8 @@ def doYolo(img):
     #model = torch.load(os.getcwd() + '/yolov5s.pt')
 
     torch.hub.set_dir(os.getcwd())
-    model = torch.hub.load('ultralytics/yolov5', 'custom', path=os.getcwd() + '/yolov5s.pt',trust_repo=True, force_reload=True)
+    #model = torch.hub.load('ultralytics/yolov5', 'custom', path=os.getcwd() + '/yolov5s.pt',trust_repo=True, source='local')
+    model = torch.hub.load(os.getcwd()+'/ultralytics_yolov5_master', 'custom', path=os.getcwd() + '/yolov5s.pt',trust_repo=True, source='local')
     #ROOT_DIR = os.getcwd()
     tobyte = []
 
