@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-cvua#7a9fv^%49k%&+tu)ij81l%!0$%1neu%&n&u(=_h0zez%=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['.herokuapp.com', 'localhost']
+ALLOWED_HOSTS = ['django-stockrcgnt.herokuapp.com', 'localhost']
 CORS_ORIGIN_ALLOW_ALL = True
 
 #STATICFILES_DIRS = os.path.join(BASE_DIR, 'static'),
