@@ -26,7 +26,8 @@ def apiOverView(request):
 
 
 def doYolo(img):
-    model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+    #model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path='static/yolov5s.pt', force_reload=True).autoshape()
     #ROOT_DIR = os.getcwd()
     tobyte = []
 
