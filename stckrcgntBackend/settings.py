@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-cvua#7a9fv^%49k%&+tu)ij81l%!0$%1neu%&n&u(=_h0zez%=
 DEBUG = False
 # DEBUG_PROPAGATE_EXCEPTIONS = True
 
-ALLOWED_HOSTS = ['django-stockrcgnt.herokuapp.com', 'localhost', '127.0.0.1', 'github.com']
+ALLOWED_HOSTS = ['django-stockrcgnt.herokuapp.com', 'localhost', '127.0.0.1', 'github.com', 'django-stockrcgnt-production.up.railway.app']
 CORS_ORIGIN_ALLOW_ALL = True
 
 #STATICFILES_DIRS = os.path.join(BASE_DIR, 'static'),
