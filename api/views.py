@@ -41,8 +41,8 @@ def doYolo(img):
         right = results.pandas().xyxy[0].xmax[x]
         bottom = results.pandas().xyxy[0].ymax[x]
 
-        img = detectedImage
-        imgcrop = img.crop((left, top, right, bottom))
+        imgtemp = detectedImage
+        imgcrop = imgtemp.crop((left, top, right, bottom))
         tobyte.append(imgcrop)
 
     result = []
@@ -84,6 +84,7 @@ def testYolo(request):
     im = Image.open(BytesIO(base64.b64decode(imgb64)))
     # print(im)
     result = doYolo(im)
-    print(result)
+    #print(result)
+    #print(len(result))
 
-    return JsonResponse({'data': 'bien'}, safe=False)
+    return JsonResponse({'data': result}, safe=False)
