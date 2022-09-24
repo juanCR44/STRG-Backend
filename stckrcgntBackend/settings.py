@@ -24,17 +24,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-cvua#7a9fv^%49k%&+tu)ij81l%!0$%1neu%&n&u(=_h0zez%='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 # DEBUG_PROPAGATE_EXCEPTIONS = True
 
-ALLOWED_HOSTS = ['django-stockrcgnt.herokuapp.com', 'localhost:3000']
+ALLOWED_HOSTS = ['django-stockrcgnt.herokuapp.com', 'localhost', '127.0.0.1']
 CORS_ORIGIN_ALLOW_ALL = True
 
 #STATICFILES_DIRS = os.path.join(BASE_DIR, 'static'),
 #STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
+#STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+#STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
