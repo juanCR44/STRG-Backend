@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
+import environ
+env = environ.Env()
+environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +49,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'api.apps.ApiConfig',
     'corsheaders',
+    'storages',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -85,11 +90,22 @@ WSGI_APPLICATION = 'stckrcgntBackend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'ENGINE': 'django.db.backends.mysql',
+    'NAME': os.environ.get('DB_NAME'),
+    'HOST': os.environ.get('DB_HOST'),
+    'PORT': os.environ.get('DB_PORT'),
+    'USER': os.environ.get('DB_USER'),
+    'PASSWORD': os.environ.get('DB_PASSWORD'),
+    'OPTIONS': {'ssl': {'ca': None}}
+  }
 }
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -125,8 +141,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+#STATIC_URL = 'static/'
 
+#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+#AWS_ACCESS_KEY_ID = 'AKIAZVBY4V4S7WW5A74Z'
+#AWS_SECRET_ACCESS_KEY = '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'
+#AWS_STORAGE_BUCKET_NAME = 'django-stckrcgnt'
+#AWS_DEFAULT_ACL = 'public-read'
+#AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+#AWS_S3_OBJECT_PARAMETERS = {'CacheControl':'max-age=86400'}
+#AWS_LOCATION = 'static'
+#STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+
+#STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+ 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
