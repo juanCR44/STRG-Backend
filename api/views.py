@@ -39,7 +39,7 @@ def doYolo(img):
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path=os.getcwd() + '/yolov5s.pt',trust_repo=True, source='local')
     # model = torch.hub.load(os.getcwd()+'/ultralytics_yolov5_master', 'custom', path= os.getcwd() + '/yolov5s.pt', source='local', skip_validation=True)
 
-    model = yolov5.load(os.getcwd() + '/SGD640best.pt')
+    model = yolov5.load(os.getcwd() + '/temp.pt')
     print(img)
     tobyte = []
 
@@ -98,8 +98,8 @@ def detect(request):
         imgb64 = data['image'].split('data:image/jpeg;base64,')[1]
     if data['image'].split('/')[1].split(';')[0] == 'png':
         imgb64 = data['image'].split('data:image/png;base64,')[1]
-    im = Image.open(BytesIO(base64.b64decode(imgb64)))
-    #im = Image.open(os.getcwd() + '/IMG_PRODUCTS_VAL826.png')
+    #im = Image.open(BytesIO(base64.b64decode(imgb64)))
+    im = Image.open(os.getcwd() + '/IMG_PRODUCTS_VAL826.png')
     result, average, names = doYolo(im)
 
     print(average, len(result)-1, ' nani')
@@ -113,7 +113,7 @@ def detect(request):
 
 
 def doYoloState(img):
-    model = yolov5.load(os.getcwd() + '/SGD640best.pt')
+    model = yolov5.load(os.getcwd() + '/temp.pt')
     results = model(img)
     #detectedImage = Image.fromarray(results.render()[0])
 
