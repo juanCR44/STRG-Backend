@@ -98,8 +98,8 @@ def detect(request):
         imgb64 = data['image'].split('data:image/jpeg;base64,')[1]
     if data['image'].split('/')[1].split(';')[0] == 'png':
         imgb64 = data['image'].split('data:image/png;base64,')[1]
-    im = Image.open(BytesIO(base64.b64decode(imgb64)))
-    #im = Image.open(os.getcwd() + '/IMG_PRODUCTS_VAL826.png')
+    #im = Image.open(BytesIO(base64.b64decode(imgb64)))
+    im = Image.open(os.getcwd() + '/IMG_PRODUCTS_VAL826.png')
     result, average, names = doYolo(im)
 
     print(average, len(result)-1, ' nani')
@@ -233,11 +233,26 @@ def getDetection(request):
 
         cursor = connection.cursor()
         sql_select_query = """select * from DetectionResult where user_id = %s and date = %s and namestate = %s"""
-
         record = (data['user_id'], data['date'], data['producttype'])
         cursor.execute(sql_select_query, record)
-
         res = dictfetchall(cursor)
+        
+        res2 = []
+        if data['producttype'] == 'MonsterOriginal_473ml':
+            sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and namestate = %s"""
+            record2 = (data['user_id'], data['date'], 'ME_MonsterOriginal_473ml')
+            cursor.execute(sql_select_query2, record2)
+            res2 = dictfetchall(cursor)
+        elif data['producttype'] == 'MonsterZeroSugar_473ml':
+            sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and namestate = %s"""
+            record2 = (data['user_id'], data['date'], 'ME_MonsterZeroSugar_473ml')
+            cursor.execute(sql_select_query2, record2)
+            res2 = dictfetchall(cursor)
+
+        if len(res2)>0:
+            totallist = res + res2
+        else:
+            totallist = res
 
         if len(res) < 1:
             return JsonResponse({'error': 'ERROR'}, safe=False)
@@ -245,7 +260,7 @@ def getDetection(request):
             #res = {'id': result[0][0], 'email': result[0][1], 'enterprise': result[0][3]}
             return JsonResponse(
                 { 
-                    'data': json.dumps(res, default=str)
+                    'data': json.dumps(totallist, default=str)
                     #json.dumps({'data': res.decode('utf-8')})
                 }, safe=False)
 
