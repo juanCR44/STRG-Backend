@@ -39,14 +39,22 @@ def doYolo(img):
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path=os.getcwd() + '/yolov5s.pt',trust_repo=True, source='local')
     # model = torch.hub.load(os.getcwd()+'/ultralytics_yolov5_master', 'custom', path= os.getcwd() + '/yolov5s.pt', source='local', skip_validation=True)
 
-    model = yolov5.load(os.getcwd() + '/temp.pt')
+    model = yolov5.load(os.getcwd() + '/best_sgd_640.pt')
     print(img)
-    tobyte = []
 
     results = model(img)
     detectedImage = Image.fromarray(results.render()[0])
     # results.show()
     size = len(results.pandas().xyxy[0])
+
+    resultGood = []
+    resultBad = []
+
+    tobyteGood = []
+    tobyteBad = []
+    namesGood = []
+    namesBad = []
+
     names = []
     average = 0
 
@@ -56,13 +64,17 @@ def doYolo(img):
         right = results.pandas().xyxy[0].xmax[x]
         bottom = results.pandas().xyxy[0].ymax[x]
         average += results.pandas().xyxy[0].confidence[x]
-        names.append(results.pandas().xyxy[0].name[x])
-
+        
         imgtemp = detectedImage
         imgcrop = imgtemp.crop((left, top, right, bottom))
-        tobyte.append(imgcrop)
 
-    result = []
+        if results.pandas().xyxy[0].name[x].split('ME')[0] == '':
+            namesBad.append(results.pandas().xyxy[0].name[x])
+            tobyteBad.append(imgcrop)
+        else:
+            namesGood.append(results.pandas().xyxy[0].name[x])
+            tobyteGood.append(imgcrop)
+
     buffered = BytesIO()
 
     detectedImage.save(buffered, format="JPEG")
@@ -70,21 +82,30 @@ def doYolo(img):
     img_base64 = bytes("data:image/jpeg;base64,", encoding='utf-8') + img_str
     final = img_base64.decode('UTF-8')
 
-    result.append(final)
+    resultGood.append(final)
 
-    for x in range(len(tobyte)):
+    for x in range(len(tobyteGood)):
         buffered = BytesIO()
-        tobyte[x].save(buffered, format="JPEG")
+        tobyteGood[x].save(buffered, format="JPEG")
         img_str = base64.b64encode(buffered.getvalue())
         img_base64 = bytes("data:image/jpeg;base64,",
                            encoding='utf-8') + img_str
         finalcrop = img_base64.decode('UTF-8')
-        result.append(finalcrop)
+        resultGood.append(finalcrop)
 
-    if len(result) > 1:
-        average = average / (len(result) - 1)
+    for x in range(len(tobyteBad)):
+        buffered = BytesIO()
+        tobyteBad[x].save(buffered, format="JPEG")
+        img_str = base64.b64encode(buffered.getvalue())
+        img_base64 = bytes("data:image/jpeg;base64,",
+                           encoding='utf-8') + img_str
+        finalcrop = img_base64.decode('UTF-8')
+        resultBad.append(finalcrop)
 
-    return result, round(average, 2), names
+    if len(resultGood) > 1 or len(resultBad) > 0:
+        average = average / ((len(resultGood) - 1) + len(resultBad))
+
+    return resultGood, resultBad,round(average, 2), namesGood, namesBad
 
 
 @api_view(['POST'])
@@ -98,17 +119,19 @@ def detect(request):
         imgb64 = data['image'].split('data:image/jpeg;base64,')[1]
     if data['image'].split('/')[1].split(';')[0] == 'png':
         imgb64 = data['image'].split('data:image/png;base64,')[1]
-    im = Image.open(BytesIO(base64.b64decode(imgb64)))
-    #im = Image.open(os.getcwd() + '/IMG_PRODUCTS_VAL826.png')
-    result, average, names = doYolo(im)
+    #im = Image.open(BytesIO(base64.b64decode(imgb64)))
+    im = Image.open(os.getcwd() + '/image.jpg')
+    resultGood, resultBad,average, namesGood, namesBad = doYolo(im)
 
-    print(average, len(result)-1, ' nani')
+    print(average, namesGood, namesBad)
     return JsonResponse(
         {
-            'imagearr': result,
-            'count': len(result) - 1,
+            'resultGood': resultGood,
+            'resultBad': resultBad,
+            'count': (len(resultGood) - 1) + len(resultBad),
             'average': average,
-            'names': names
+            'namesGood': namesGood,
+            'namesBad': namesBad
         }, safe=False)
 
 
@@ -173,15 +196,14 @@ def registerUser(request):
 
 @api_view(['POST'])
 def registerDetection(request):
-
     try:
         data = request.data
         cursor = connection.cursor()
-        mySql_insert_query = """INSERT INTO DetectionResult (user_id, count, percentage, date, namestate, imagestate, percentagestate, state)
+        mySql_insert_query = """INSERT INTO DetectionResult (user_id, count, percentage, date, names, nametype,images)
                                VALUES
-                               (%s, %s, %s, %s, %s, %s, %s, %s) """
+                               (%s, %s, %s, %s, %s, %s, %s) """
 
-        record = (data['user_id'], data['count'], data['percentage'], datetime.datetime.now(), data['namestate'], data['imagestate'], data['percentagestate'], data['state'])
+        record = (data['user_id'], data['count'], data['percentage'], datetime.datetime.now(),  data['names'], data['nametype'],data['images'])
         cursor.execute(mySql_insert_query, record)
 
         connection.commit()
@@ -232,27 +254,49 @@ def getDetection(request):
         data = request.data
 
         cursor = connection.cursor()
-        sql_select_query = """select * from DetectionResult where user_id = %s and date = %s and namestate = %s"""
+        sql_select_query = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
         record = (data['user_id'], data['date'], data['producttype'])
         cursor.execute(sql_select_query, record)
         res = dictfetchall(cursor)
         
-        res2 = []
-        if data['producttype'] == 'MonsterOriginal_473ml':
-            sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and namestate = %s"""
-            record2 = (data['user_id'], data['date'], 'ME_MonsterOriginal_473ml')
-            cursor.execute(sql_select_query2, record2)
-            res2 = dictfetchall(cursor)
-        elif data['producttype'] == 'MonsterZeroSugar_473ml':
-            sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and namestate = %s"""
-            record2 = (data['user_id'], data['date'], 'ME_MonsterZeroSugar_473ml')
-            cursor.execute(sql_select_query2, record2)
-            res2 = dictfetchall(cursor)
+        ##res2 = []
+        ##if data['producttype'] == 'IncaKola_1.5L':
+        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
+        ##    record2 = (data['user_id'], data['date'], 'ME_IncaKola_1.5L')
+        ##    cursor.execute(sql_select_query2, record2)
+        ##    res2 = dictfetchall(cursor)
+        ##elif data['producttype'] == 'SanMateo_2.5L':
+        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
+        ##    record2 = (data['user_id'], data['date'], 'ME_SanMateo_2.5L')
+        ##    cursor.execute(sql_select_query2, record2)
+        ##    res2 = dictfetchall(cursor)
+        ##elif data['producttype'] == 'Cielo_2.5L':
+        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
+        ##    record2 = (data['user_id'], data['date'], 'ME_Cielo_2.5L')
+        ##    cursor.execute(sql_select_query2, record2)
+        ##    res2 = dictfetchall(cursor)
+        ##elif data['producttype'] == 'MonsterOriginal_473ml':
+        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
+        ##    record2 = (data['user_id'], data['date'], 'ME_MonsterOriginal_473ml')
+        ##    cursor.execute(sql_select_query2, record2)
+        ##    res2 = dictfetchall(cursor)
+        ##elif data['producttype'] == 'MonsterZeroSugar_473ml':
+        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
+        ##    record2 = (data['user_id'], data['date'], 'ME_MonsterZeroSugar_473ml')
+        ##    cursor.execute(sql_select_query2, record2)
+        ##    res2 = dictfetchall(cursor)
+        ##elif data['producttype'] == 'RedBull_250ml':
+        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
+        ##    record2 = (data['user_id'], data['date'], 'ME_RedBull_250ml')
+        ##    cursor.execute(sql_select_query2, record2)
+        ##    res2 = dictfetchall(cursor)
+##
+        ##if len(res2)>0:
+        ##    totallist = res + res2
+        ##else:
+        ##    totallist = res
 
-        if len(res2)>0:
-            totallist = res + res2
-        else:
-            totallist = res
+        totallist = res
 
         if len(res) < 1:
             return JsonResponse({'error': 'ERROR'}, safe=False)
