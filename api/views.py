@@ -119,8 +119,8 @@ def detect(request):
         imgb64 = data['image'].split('data:image/jpeg;base64,')[1]
     if data['image'].split('/')[1].split(';')[0] == 'png':
         imgb64 = data['image'].split('data:image/png;base64,')[1]
-    #im = Image.open(BytesIO(base64.b64decode(imgb64)))
-    im = Image.open(os.getcwd() + '/image.jpg')
+    im = Image.open(BytesIO(base64.b64decode(imgb64)))
+    #im = Image.open(os.getcwd() + '/image.jpg')
     resultGood, resultBad,average, namesGood, namesBad = doYolo(im)
 
     print(average, namesGood, namesBad)
