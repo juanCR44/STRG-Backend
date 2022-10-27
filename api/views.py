@@ -60,7 +60,7 @@ def doYolo(img):
 
     for x in range(size):
         average += results.pandas().xyxy[0].confidence[x]
-        if average < 0.75:
+        if average < 0.85:
             continue
 
         left = results.pandas().xyxy[0].xmin[x]
