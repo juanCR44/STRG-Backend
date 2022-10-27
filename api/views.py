@@ -59,11 +59,14 @@ def doYolo(img):
     average = 0
 
     for x in range(size):
+        average += results.pandas().xyxy[0].confidence[x]
+        if average < 0.75:
+            continue
+
         left = results.pandas().xyxy[0].xmin[x]
         top = results.pandas().xyxy[0].ymin[x]
         right = results.pandas().xyxy[0].xmax[x]
         bottom = results.pandas().xyxy[0].ymax[x]
-        average += results.pandas().xyxy[0].confidence[x]
         
         imgtemp = detectedImage
         imgcrop = imgtemp.crop((left, top, right, bottom))
