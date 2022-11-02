@@ -1,24 +1,30 @@
-FROM python:3.10.0a1-alpine3.12
-
+FROM homebrew/ubuntu20.04
 COPY requirements.txt /app/requirements.txt
-RUN pip install pipenv
-RUN pip install ez_setup
-RUN apk add g++ jpeg-dev zlib-dev libjpeg make
 
+RUN sudo apt-get update
+RUN sudo apt-get install -y python3-pip
+RUN sudo pip3 install pipenv
+RUN sudo pip3 install ez_setup
+RUN sudo pip3 install gunicorn
 
-RUN pip install --upgrade pip setuptools wheel
-RUN apk --no-cache add musl-dev linux-headers g++
-RUN apk add --no-cache --virtual .build-deps musl-dev linux-headers g++ gcc zlib-dev make python3-dev jpeg-dev
-RUN pip install matplotlib
+RUN sudo pip3 install --upgrade pip setuptools wheel
+RUN sudo apt-get install musl-dev linux-headers-generic g++ gcc zlib1g-dev make python3-dev libjpeg-dev libgl1-mesa-glx libglib2.0-0 --assume-yes 
+RUN sudo pip3 install importlib_metadata
+
+RUN sudo apt-get update && sudo apt-get install --assume-yes cmake \ 
+                        #openblas-dev \ 
+                        libopenblas-dev \ 
+                        gfortran \ 
+                        musl-dev \ 
+                        libffi-dev \
+                        gcc \
+                        libc-dev
 
 RUN set -ex \
-    && pip install --upgrade pip \
-    && pip install --no-cache-dir -r /app/requirements.txt
+    && sudo pip3 install --upgrade pip \
+    && sudo pip3 install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host=files.pythonhosted.org --no-cache-dir -r /app/requirements.txt
 
 WORKDIR /app
-
 ADD . .
 
-EXPOSE 8000
-
-CMD [ "gunicorn", "--bind", ":8000", "--workers", "3", "core.wsgi:application"]
+CMD gunicorn stckrcgntBackend.wsgi:application --bind 0.0.0.0:$PORT

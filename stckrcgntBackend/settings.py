@@ -12,9 +12,6 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 import os
-import environ
-env = environ.Env()
-environ.Env.read_env()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,11 +27,8 @@ SECRET_KEY = 'django-insecure-cvua#7a9fv^%49k%&+tu)ij81l%!0$%1neu%&n&u(=_h0zez%=
 DEBUG = False
 # DEBUG_PROPAGATE_EXCEPTIONS = True
 
-ALLOWED_HOSTS = ['django-stockrcgnt.herokuapp.com', 'localhost', '127.0.0.1', 'github.com', 'django-stockrcgnt-production.up.railway.app']
+ALLOWED_HOSTS = ['vast-beyond-27788.herokuapp.com', 'localhost', '127.0.0.1', 'github.com']
 CORS_ORIGIN_ALLOW_ALL = True
-
-#STATICFILES_DIRS = os.path.join(BASE_DIR, 'static'),
-#STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT =os.path.join(BASE_DIR, 'staticfiles')
@@ -84,18 +78,14 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'stckrcgntBackend.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-
 DATABASES = {
     'default': {
     'ENGINE': 'django.db.backends.mysql',
-    'NAME': os.environ.get('DB_NAME'),
-    'HOST': os.environ.get('DB_HOST'),
-    'PORT': os.environ.get('DB_PORT'),
-    'USER': os.environ.get('DB_USER'),
-    'PASSWORD': os.environ.get('DB_PASSWORD'),
+    'NAME': 'django-stckrgnt',
+    'HOST': 'us-east.connect.psdb.cloud',
+    'PORT': '3306',
+    'USER':'7e4ecjqtvbhke2tgyub3',
+    'PASSWORD': 'pscale_pw_5NjEIMNTDhnPFpI5l19Jh6ldE1EwBK55xocPGHq0LxO',
     'OPTIONS': {'ssl': {'ca': None}}
   }
 }
@@ -106,9 +96,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
-
-# Password validation
-# https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -125,10 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'UTC'
@@ -137,25 +120,15 @@ USE_I18N = True
 
 USE_TZ = True
 
+STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = 'AKIAZVBY4V4S7WW5A74Z'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'django-stckrcgnt'
+AWS_DEFAULT_ACL = 'public-read'
+AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+AWS_S3_OBJECT_PARAMETERS = {'CacheControl':'max-age=86400'}
+AWS_LOCATION = 'static'
+STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.0/howto/static-files/
-
-#STATIC_URL = 'static/'
-
-#STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-#AWS_ACCESS_KEY_ID = 'AKIAZVBY4V4S7WW5A74Z'
-#AWS_SECRET_ACCESS_KEY = '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'
-#AWS_STORAGE_BUCKET_NAME = 'django-stckrcgnt'
-#AWS_DEFAULT_ACL = 'public-read'
-#AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-#AWS_S3_OBJECT_PARAMETERS = {'CacheControl':'max-age=86400'}
-#AWS_LOCATION = 'static'
-#STATIC_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
-
-#STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
- 
-# Default primary key field type
-# https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

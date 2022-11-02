@@ -39,7 +39,7 @@ def doYolo(img):
     # model = torch.hub.load('ultralytics/yolov5', 'custom', path=os.getcwd() + '/yolov5s.pt',trust_repo=True, source='local')
     # model = torch.hub.load(os.getcwd()+'/ultralytics_yolov5_master', 'custom', path= os.getcwd() + '/yolov5s.pt', source='local', skip_validation=True)
 
-    model = yolov5.load(os.getcwd() + '/best_sgd_640.pt')
+    model = yolov5.load(os.getcwd() + '/best200epochsSGD.pt')
     print(img)
 
     results = model(img)
@@ -62,7 +62,7 @@ def doYolo(img):
         average += results.pandas().xyxy[0].confidence[x]
         if average < 0.85:
             continue
-
+                
         left = results.pandas().xyxy[0].xmin[x]
         top = results.pandas().xyxy[0].ymin[x]
         right = results.pandas().xyxy[0].xmax[x]
@@ -262,43 +262,6 @@ def getDetection(request):
         cursor.execute(sql_select_query, record)
         res = dictfetchall(cursor)
         
-        ##res2 = []
-        ##if data['producttype'] == 'IncaKola_1.5L':
-        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
-        ##    record2 = (data['user_id'], data['date'], 'ME_IncaKola_1.5L')
-        ##    cursor.execute(sql_select_query2, record2)
-        ##    res2 = dictfetchall(cursor)
-        ##elif data['producttype'] == 'SanMateo_2.5L':
-        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
-        ##    record2 = (data['user_id'], data['date'], 'ME_SanMateo_2.5L')
-        ##    cursor.execute(sql_select_query2, record2)
-        ##    res2 = dictfetchall(cursor)
-        ##elif data['producttype'] == 'Cielo_2.5L':
-        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
-        ##    record2 = (data['user_id'], data['date'], 'ME_Cielo_2.5L')
-        ##    cursor.execute(sql_select_query2, record2)
-        ##    res2 = dictfetchall(cursor)
-        ##elif data['producttype'] == 'MonsterOriginal_473ml':
-        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
-        ##    record2 = (data['user_id'], data['date'], 'ME_MonsterOriginal_473ml')
-        ##    cursor.execute(sql_select_query2, record2)
-        ##    res2 = dictfetchall(cursor)
-        ##elif data['producttype'] == 'MonsterZeroSugar_473ml':
-        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
-        ##    record2 = (data['user_id'], data['date'], 'ME_MonsterZeroSugar_473ml')
-        ##    cursor.execute(sql_select_query2, record2)
-        ##    res2 = dictfetchall(cursor)
-        ##elif data['producttype'] == 'RedBull_250ml':
-        ##    sql_select_query2 = """select * from DetectionResult where user_id = %s and date = %s and nametype = %s"""
-        ##    record2 = (data['user_id'], data['date'], 'ME_RedBull_250ml')
-        ##    cursor.execute(sql_select_query2, record2)
-        ##    res2 = dictfetchall(cursor)
-##
-        ##if len(res2)>0:
-        ##    totallist = res + res2
-        ##else:
-        ##    totallist = res
-
         totallist = res
 
         if len(res) < 1:
